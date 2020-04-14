@@ -14,8 +14,10 @@ module Neo4j
             result = query(session, 'CALL db.indexes()', {}, skip_instrumentation: true)
 
             result.map do |row|
-              label, property = row.description.match(/INDEX ON :([^\(]+)\(([^\)]+)\)/)[1, 2]
-              {type: row.type.to_sym, label: label.to_sym, properties: [property.to_sym], state: row.state.to_sym}
+              label = row.tokenNames.first.to_sym
+              properties = row.properties.map(&:to_sym)
+
+              {type: row.type.to_sym, label: label, properties: properties, state: row.state.to_sym}
             end
           end
 
